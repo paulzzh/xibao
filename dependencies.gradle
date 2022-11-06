@@ -1,5 +1,6 @@
 // Add your dependencies here
 
 dependencies {
-
+    //compileOnly("com.github.GTNewHorizons:bettercrashes:1.7.10-1.1.7-GTNH:dev")
+    compileOnly files("libs/bettercrashes-1.7.10-1.1.7-GTNH-dev.jar")
 }

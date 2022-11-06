@@ -1,67 +1,77 @@
 package org.teacon.xibao;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.DisconnectedScreen;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.IExtensionPoint;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLPaths;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.*;
+import net.minecraft.util.ResourceLocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-
-@Mod("xibao")
+@Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.7.10]")
 public class Xibao {
-    public Xibao() {
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-            () -> new IExtensionPoint.DisplayTest(() -> "ANY", (a, b) -> b));
+    public static final ResourceLocation LOCATION = new ResourceLocation("xibao", "textures/xibao.png");
+    @SidedProxy(clientSide = Tags.GROUPNAME + ".ClientProxy", serverSide = Tags.GROUPNAME + ".CommonProxy")
+    public static CommonProxy proxy;
+    private static Logger LOG = LogManager.getLogger(Tags.MODID);
+
+    public static void debug(String message) {
+        LOG.debug(message);
     }
 
-    @Mod.EventBusSubscriber(modid = "xibao", value = Dist.CLIENT)
-    public static final class XibaoImpl {
-        private static final ResourceLocation LOCATION = new ResourceLocation("xibao", "textures/xibao.png");
-        @SubscribeEvent
-        public static void on(ScreenEvent.InitScreenEvent.Post event) {
-            var showXibao = !Files.exists(FMLPaths.GAMEDIR.get().resolve(".xibao_stop"));
-            if (showXibao && event.getScreen() instanceof DisconnectedScreen s) {
-                var disableXibao = new Button(s.width / 2 - 75, s.height - 30, 150, 20, new TranslatableComponent("xibao.do_not_show_again"), btn -> {
-                    var gameDir = FMLPaths.GAMEDIR.get();
-                    try {
-                        Files.writeString(gameDir.resolve(".xibao_stop"), "Remove this file to show Xibao again", StandardCharsets.UTF_8);
-                    } catch (IOException e) {
-                        return;
-                    }
-                    btn.active = false;
-                });
-                event.addListener(disableXibao);
-            }
-        }
+    public static void info(String message) {
+        LOG.info(message);
+    }
 
-        @SubscribeEvent
-        public static void on(ScreenEvent.BackgroundDrawnEvent event) {
-            var showXibao = !Files.exists(FMLPaths.GAMEDIR.get().resolve(".xibao_stop"));
-            if (showXibao && event.getScreen() instanceof DisconnectedScreen s) {
-                Tesselator tesselator = Tesselator.getInstance();
-                BufferBuilder bufferbuilder = tesselator.getBuilder();
-                RenderSystem.setShaderTexture(0, LOCATION);
-                bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-                bufferbuilder.vertex(0.0D, s.height, 0.0D).uv(0F, 1F).color(255, 255, 255, 255).endVertex();
-                bufferbuilder.vertex(s.width, s.height, 0.0D).uv(1F, 1F).color(255, 255, 255, 255).endVertex();
-                bufferbuilder.vertex(s.width, 0.0D, 0.0D).uv(1F, 0F).color(255, 255, 255, 255).endVertex();
-                bufferbuilder.vertex(0.0D, 0.0D, 0.0D).uv(0F, 0F).color(255, 255, 255, 255).endVertex();
-                tesselator.end();
-            }
-        }
+    public static void warn(String message) {
+        LOG.warn(message);
+    }
+
+    public static void error(String message) {
+        LOG.error(message);
+    }
+
+    @Mod.EventHandler
+    // preInit "Run before anything else. Read your config, create blocks, items,
+    // etc, and register them with the GameRegistry."
+    public void preInit(FMLPreInitializationEvent event) {
+        proxy.preInit(event);
+    }
+
+    @Mod.EventHandler
+    // load "Do your mod setup. Build whatever data structures you care about. Register recipes."
+    public void init(FMLInitializationEvent event) {
+        proxy.init(event);
+    }
+
+    @Mod.EventHandler
+    // postInit "Handle interaction with other mods, complete your setup based on this."
+    public void postInit(FMLPostInitializationEvent event) {
+        proxy.postInit(event);
+    }
+
+    @Mod.EventHandler
+    public void serverAboutToStart(FMLServerAboutToStartEvent event) {
+        proxy.serverAboutToStart(event);
+    }
+
+    @Mod.EventHandler
+    // register server commands in this event handler
+    public void serverStarting(FMLServerStartingEvent event) {
+        proxy.serverStarting(event);
+    }
+
+    @Mod.EventHandler
+    public void serverStarted(FMLServerStartedEvent event) {
+        proxy.serverStarted(event);
+    }
+
+    @Mod.EventHandler
+    public void serverStopping(FMLServerStoppingEvent event) {
+        proxy.serverStopping(event);
+    }
+
+    @Mod.EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        proxy.serverStopped(event);
     }
 }

@@ -5,9 +5,9 @@ name: Build and test
 
 on:
   pull_request:
-    branches: [ master, main ]
+    branches: [ 1.7.10-forge ]
   push:
-    branches: [ master, main ]
+    branches: [ 1.7.10-forge ]
 
 jobs:
   build-and-test:
@@ -32,14 +32,3 @@ jobs:
 
     - name: Build the mod
       run: ./gradlew build
-
-    - name: Run server for 1.5 minutes
-      run: |
-        mkdir run
-        echo "eula=true" > run/eula.txt  
-        timeout 90 ./gradlew runServer | tee --append server.log || true
-
-    - name: Test no errors reported during server run
-      run: |
-        chmod +x .github/scripts/test-no-error-reports.sh
-        .github/scripts/test-no-error-reports.sh

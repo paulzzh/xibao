@@ -18,7 +18,7 @@ public enum Mixin {
 
     // Replace with your own mixins:
 
-    ItemEditableBookMixin("minecraft.GUIScreenMixin", Side.CLIENT, VANILLA),
+    GuiDisconnectedMixin("minecraft.GuiDisconnectedMixin", Side.CLIENT, VANILLA),
     GuiProblemScreenMixin("bettercrashes.GuiProblemScreenMixin", Side.CLIENT, BETTERCRASHES);
 
     public final String mixinClass;
